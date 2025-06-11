@@ -1,10 +1,15 @@
 
+using AssessmentsApp.WebApi.Agents;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services
-    .AddOpenApi();
+    .AddOpenApi()
+    .AddControllers();
+
+builder.Services.AddTransient<AssessmentCreatorApp>();
 
 var app = builder.Build();
 
@@ -50,7 +55,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
-
+app.MapControllers();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

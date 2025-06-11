@@ -1,71 +1,59 @@
-﻿using Microsoft.SemanticKernel;
+﻿using Azure.AI.Agents.Persistent;
+using Azure.Identity;
+using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Agents;
 using Microsoft.SemanticKernel.Agents.AzureAI;
 using Microsoft.SemanticKernel.Agents.Chat;
+using Microsoft.SemanticKernel.ChatCompletion;
 using System.Text;
 
 namespace AssessmentsApp.WebApi.Agents
 {
 #pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    public class SkillsSearchSession(Kernel kernel, Azure.AI.Agents.Persistent.PersistentAgentsClient agentsClient, AzureAIAgent researcherAgent, ChatCompletionAgent marketingAgent, ChatCompletionAgent writerAgent, ChatCompletionAgent editorAgent)
-#pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+    public class SkillsSearchSession(PersistentAgentsClient agentsClient, AzureAIAgent agent)
+#pragma warning restore SKEXP0110
     {
-        internal async IAsyncEnumerable<AIChatCompletionDelta> ProcessStreamingRequest(CreateWriterRequest createWriterRequest)
+#pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+        internal async Task<string> ProcessRequest(string userInput)
+#pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         {
-            // create an conversation Thread with the Researcher agent
-            var threadResponse = await agentsClient.Threads.CreateThreadAsync();
-            var thread = threadResponse.Value;
+            string? result = string.Empty;
+            //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-types/azure-ai-agent?pivots=programming-language-csharp
 
-            StringBuilder sbResearchResults = new();
-            await foreach (ChatMessageContent response in researcherAgent.InvokeAsync(thread.Id, new KernelArguments() { { "research_context", createWriterRequest.Research } }))
+            //var assessmentTemplate = ReadFileForPromptTemplateConfig("./Agents/Prompts/assessment.yaml");
+
+            
+            //var assessmentsAgent = await agentsClient.Administration.GetAgentAsync("asst_32IkQqw7tCO9aGBOxBezivXA");
+//#pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//            AzureAIAgent agent = new(assessmentsAgent, 
+//                                        agentsClient,
+//                                        templateFactory: new KernelPromptTemplateFactory(),
+//                                        templateFormat: PromptTemplateConfig.SemanticKernelTemplateFormat);
+//#pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+//            // create an conversation Thread with the Researcher agent
+#pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            AzureAIAgentThread agentThread = new(agent.Client);
+#pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
+            try
             {
-                sbResearchResults.AppendLine(response.Content);
-                yield return new AIChatCompletionDelta(Delta: new AIChatMessageDelta
+                ChatMessageContent message = new(AuthorRole.User, userInput);
+                await foreach (ChatMessageContent response in agent.InvokeAsync(message, agentThread))
                 {
-                    Role = AIChatRole.Assistant,
-                    Context = new AIChatAgentInfo(CreativeWriterApp.ResearcherName),
-                    Content = response.Content,
-                });
-            }
-
-            StringBuilder sbProductResults = new();
-            await foreach (ChatMessageContent response in marketingAgent.InvokeAsync([], new() { { "product_context", createWriterRequest.Products } }))
-            {
-                sbProductResults.AppendLine(response.Content);
-                yield return new AIChatCompletionDelta(Delta: new AIChatMessageDelta
-                {
-                    Role = AIChatRole.Assistant,
-                    Context = new AIChatAgentInfo(CreativeWriterApp.MarketingName),
-                    Content = response.Content,
-                });
-            }
-
-            writerAgent.Arguments["research_context"] = createWriterRequest.Research;
-            writerAgent.Arguments["research_results"] = sbResearchResults.ToString();
-            writerAgent.Arguments["product_context"] = createWriterRequest.Products;
-            writerAgent.Arguments["product_results"] = sbProductResults.ToString();
-            writerAgent.Arguments["assignment"] = createWriterRequest.Writing;
-
-            AgentGroupChat chat = new(writerAgent, editorAgent)
-            {
-                LoggerFactory = kernel.LoggerFactory,
-                ExecutionSettings = new AgentGroupChatSettings
-                {
-                    SelectionStrategy = new SequentialSelectionStrategy() { InitialAgent = writerAgent },
-                    TerminationStrategy = new NoFeedbackLeftTerminationStrategy()
+                    result = response.Content;
                 }
-            };
-
-            await foreach (ChatMessageContent response in chat.InvokeAsync())
-            {
-                yield return new AIChatCompletionDelta(Delta: new AIChatMessageDelta
-                {
-                    Role = AIChatRole.Assistant,
-                    Context = new AIChatAgentInfo(response.AuthorName ?? ""),
-                    Content = response.Content,
-                });
             }
+            finally
+            {
+                await agentThread.DeleteAsync();
+            }
+
+            return result;
         }
 
+        public async Task CleanupSessionAsync()
+        {
+            // delete all Agents from the session, otherwise they will not be deleted on the service/backend of Azure AI Agents Service
+            await agentsClient.Administration.DeleteAgentAsync(agent.Id);
+        }
     }
 }
