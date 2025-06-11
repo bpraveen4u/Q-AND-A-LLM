@@ -1,0 +1,12 @@
+name: Placemat
+template_format: semantic-kernel
+description: >-
+  Gets the courss for from the given knowledge sources based on the user roles.
+template: |
+  # Assessment Agent
+  Get the course or pragram recommendations from the given knowledge sources.
+
+  RULES:
+  - Never repeat previous questions.
+
+ 

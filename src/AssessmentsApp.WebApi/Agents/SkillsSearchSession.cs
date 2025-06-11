@@ -20,17 +20,6 @@ namespace AssessmentsApp.WebApi.Agents
             string? result = string.Empty;
             //https://learn.microsoft.com/en-us/semantic-kernel/frameworks/agent/agent-types/azure-ai-agent?pivots=programming-language-csharp
 
-            //var assessmentTemplate = ReadFileForPromptTemplateConfig("./Agents/Prompts/assessment.yaml");
-
-            
-            //var assessmentsAgent = await agentsClient.Administration.GetAgentAsync("asst_32IkQqw7tCO9aGBOxBezivXA");
-//#pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-//            AzureAIAgent agent = new(assessmentsAgent, 
-//                                        agentsClient,
-//                                        templateFactory: new KernelPromptTemplateFactory(),
-//                                        templateFormat: PromptTemplateConfig.SemanticKernelTemplateFormat);
-//#pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-//            // create an conversation Thread with the Researcher agent
 #pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
             AzureAIAgentThread agentThread = new(agent.Client);
 #pragma warning restore SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.

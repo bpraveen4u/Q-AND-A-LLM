@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <title>Post Data Example</title>
+</head>
+<body>
+    <h2>Send Message</h2>
+    <input type="text" id="messageInput" placeholder="Enter your message" />
+    <button onclick="postData()">Send</button>
+
+    <p id="responseOutput"></p> <!-- Paragraph to display the response -->
+
+    <script>
+    function postData() {
+      const message = document.getElementById('messageInput').value;
+      const output = document.getElementById('responseOutput');
+
+      fetch('/chat/agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message: message })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.text();
+      })
+      .then(data => {
+        output.textContent = 'Server says: ' + data;
+      })
+      .catch(error => {
+        output.textContent = 'Error: ' + error.message;
+      });
+    }
+    </script>
+</body>
+</html>

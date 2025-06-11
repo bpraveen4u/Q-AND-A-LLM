@@ -27,10 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Agents\Prompts\" />
+    <None Include="wwwroot\index.htm">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Agents\Prompts\placemat.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Agents\Prompts\assessment.yaml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

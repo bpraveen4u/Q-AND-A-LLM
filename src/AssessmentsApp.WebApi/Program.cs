@@ -27,20 +27,20 @@ var summaries = new[]
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
 };
 
-app.MapGet("/", async context =>
-{
-    context.Response.ContentType = "text/html; charset=utf-8";
-    await context.Response.WriteAsync(@"
-        <html>
-        <head>
-            <title>Weather Forecast</title>
-        </head>
-            <body>
-            <p>call the get weather api using below link  <a href=""/weatherforecast"">Get Weather forecast</a> </p>
+//app.MapGet("/", async context =>
+//{
+//    context.Response.ContentType = "text/html; charset=utf-8";
+//    await context.Response.WriteAsync(@"
+//        <html>
+//        <head>
+//            <title>Weather Forecast</title>
+//        </head>
+//            <body>
+//            <p>call the get weather api using below link  <a href=""/weatherforecast"">Get Weather forecast</a> </p>
               
-            </body>
-        </html>");
-});
+//            </body>
+//        </html>");
+//});
 
 app.MapGet("/weatherforecast", () =>
 {
@@ -55,6 +55,9 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapControllers();
 app.Run();
 
