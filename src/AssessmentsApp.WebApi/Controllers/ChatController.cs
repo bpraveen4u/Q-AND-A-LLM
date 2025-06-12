@@ -34,7 +34,7 @@ namespace AssessmentsApp.WebApi.Controllers
             }
             catch (Exception)
             {
-                throw;
+                throw; // rethrowing the exception to maintain the stack trace
             }
             finally
             {

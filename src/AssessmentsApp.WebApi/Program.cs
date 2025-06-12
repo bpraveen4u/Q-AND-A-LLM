@@ -1,10 +1,18 @@
 
 using AssessmentsApp.WebApi.Agents;
+using Azure.Identity;
+using Microsoft.SemanticKernel;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+builder.Services
+    .AddKernel()
+    .AddAzureOpenAIChatCompletion(deploymentName: builder.Configuration["AzureDeployment"]!, endpoint: builder.Configuration["Endpoint"]!, new AzureCliCredential())
+    ;
+
 builder.Services
     .AddOpenApi()
     .AddControllers();
