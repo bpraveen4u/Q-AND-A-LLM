@@ -9,7 +9,7 @@ using System.Text;
 namespace AssessmentsApp.WebApi.Agents
 {
 #pragma warning disable SKEXP0110 // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
-    public class SkillsSearchSession(PersistentAgentsClient agentsClient, AzureAIAgent agent, ChatCompletionAgent chatCompletionAgent)
+    public class SkillsSearchSession(AzureAIAgent agent, ChatCompletionAgent chatCompletionAgent)
     {
         // Type is for evaluation purposes only and is subject to change or removal in future updates. Suppress this diagnostic to proceed.
         internal async Task<string> ProcessRequest(string userInput)

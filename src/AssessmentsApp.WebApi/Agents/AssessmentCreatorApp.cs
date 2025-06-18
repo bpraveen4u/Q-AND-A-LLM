@@ -27,7 +27,7 @@ namespace AssessmentsApp.WebApi.Agents
             var assessmentTemplate = ReadFileForPromptTemplateConfig("./Agents/Prompts/assessment.yaml");
 
             var agent = await agentsClient.Administration.GetAgentAsync("asst_YK2flcJLkjtQBgnEC9qkJsiN");
-            AzureAIAgent a = new(agent, agentsClient);
+            AzureAIAgent aiAgent = new(agent, agentsClient);
             //var assessmentsAgent = await agentsClient.Administration.CreateAgentAsync("gpt-4.1-mini",
             //    name: assessmentTemplate.Name,
             //    description: assessmentTemplate.Description,
@@ -47,7 +47,7 @@ namespace AssessmentsApp.WebApi.Agents
                 Kernel = defaultKernel,
             };
 
-            return new SkillsSearchSession(agentsClient, a, chatCompletionAgent);
+            return new SkillsSearchSession(aiAgent, chatCompletionAgent);
         }
 
         private static PromptTemplateConfig ReadFileForPromptTemplateConfig(string fileName)
